@@ -6,16 +6,12 @@
 
 (local chars {})
 
-(local initial-positions {:Hero [-17 0] :Willie [7 0] :Colter [264 16] :Tyler [84 300] :Neil [39 304]})
-(set chars.Hero {:name "Hero" :spr 256 :portrait 257})
+(local initial-positions {:Hero [105 75] :Willie [125 65] :Colter [264 16] :Tyler [84 300] :Neil [39 304]})
+(set chars.Hero {:name "Hero" :spr 256 :portrait 257 :side-1 259 :side-2 260 :down-1 261 :down-2 262 :up-1 263 :up-2 264})
 (set chars.Willie {:name "Willie" :spr 288 :portrait 289})
 (set chars.Colter {:name "Colter" :spr 320 :portrait 321})
 (set chars.Tyler {:name "Tyler" :spr 352 :portrait 353})
 (set chars.Neil {:name "Neil" :spr 384 :portrait 385})
-
-(fn lerp
-  [a b t]
-  (+ (* a (- 1 t)) (* t b)))
 
 (fn init
   []
@@ -24,74 +20,74 @@
      (tset (. chars name) :x x)
      (tset (. chars name) :y y))))
 
+(fn walking-animation
+  [anim-spr-1 anim-spr-2 x y flip?]
+  (if
+    (= 1 (// (% t 60) 40))
+    (spr anim-spr-1 x y 0 1 flip? 0 1 2)
+
+    (= 0 (// (% t 60) 40))
+    (spr anim-spr-2 x y 0 1 flip? 0 1 2)))
+
 (fn draw
   []
-  (let [c chars.Hero]
-    (spr c.spr (+ cam-x c.x) (+ cam-y c.y) 0 1 0 0 (or c.w 1) (or c.h 2)))
-  (let [c chars.Willie]
-    (spr c.spr (+ cam-x c.x) (+ cam-y c.y) 0 1 1 0 (or c.w 1) (or c.h 2)))
+  (map 12 7 7 11 96 56 1 1)
   (if
-    (= 1 (// (% t 60) 30))
-    (spr 5 (- cam-x 1) cam-y 0 1 0 0 1 1)
+   (= 1 (// (% t 60) 30))
+   (spr 5 120 64 0 1 0 0 1 1)
 
-    (= 0 (// (% t 60) 30))
-    (spr 6 (- cam-x 1) cam-y 0 1 0 0 1 1)))
-
-(fn filter [f t]
-  (local res [])
-  (each [_ x (pairs t)]
-    (when (f x) (table.insert res x)))
-  res)
-
-(fn hit?
-  [px py char]
-  (and (~= :Hero char.name)
-       (<= char.x px (+ char.x (- (* (or char.w 1) 8) 1)))
-       (<= char.y py (+ char.y (- (* (or char.h 2) 8) 1)))))
+   (= 0 (// (% t 60) 30))
+   (spr 6 120 64 0 1 0 0 1 1))
+  (let [c chars.Willie]
+    (spr c.spr c.x c.y 0 1 1 0 1 2))
+  (let [c chars.Hero]
+    (if
+      (btn 0)
+      (walking-animation c.up-1 c.up-2 c.x c.y 0)
+      (btn 1)
+      (walking-animation c.down-1 c.down-2 c.x c.y 0)
+      (btn 2)
+      (walking-animation c.side-1 c.side-2 c.x c.y 1)
+      (btn 3)
+      (walking-animation c.side-1 c.side-2 c.x c.y 0)
+      (spr c.spr c.x c.y 0 1 0 0 1 2))))
 
 (fn can-move-point?
-  [px py thru-chars?]
-;;  (trace (// px 8))
-;;  (trace (// py 8))
-;;  (trace (mget (// px 8) (// py 8)))
-  ;;(trace (or thru-chars? (= 0 (# (filter (partial hit? px py) chars)))))
-  (and (= 1 (mget (// px 8) (// py 8)))
-       (or thru-chars? (= 0 (# (filter (partial hit? px py) chars))))))
+  [px py]
+  (= 1 (mget (// px 8) (// py 8))))
 
 (fn can-move?
-  [x y thru-chars?]
- (and (can-move-point? x y thru-chars?)
-  (can-move-point? (+ x 6) y thru-chars?)
-  (can-move-point? x (+ y 7) thru-chars?)
-  (can-move-point? (+ x 6) (+ y 7) thru-chars?)))
+  [x y]
+  (and (can-move-point? x y)
+       (can-move-point? (+ x 5) y)))
 
 (fn move
   []
-  (let [amt (if (btn 5) 1.7 1)
-        dx (if (btn 2) (- amt) (btn 3) amt 0)
-        dy (if (btn 0) (- amt) (btn 1) amt 0)
-        x chars.Hero.x
-        y chars.Hero.y]
-    (if (can-move? (+ x dx) (+ y dy 8))
-      (set (chars.Hero.x chars.Hero.y) (values (+ x dx) (+ y dy))))))
+  (let [dx  (if (btn 2) -1 (btn 3) 1 0)
+        dy  (if (btn 0) -1 (btn 1) 1 0)
+        x   chars.Hero.x
+        y   chars.Hero.y]
+    (if
+      (can-move? (+ x dx) (+ y dy 15))
+      (set (chars.Hero.x chars.Hero.y) (values (+ x dx) (+ y dy)))
 
-      ;; if you're stuck at the start of the frame, don't let character
-      ;; collisions stop you from getting un-stuck
-;;      (and (not (can-move? x (+ 8 y))) (can-move? (+ x dx) (+ y dy 8) true))
-;;      (set (chars.Hero.x chars.Hero.y) (values (+ x dx) (+ y dy)))
-;;
-;;      (can-move? (+ x dx) (+ y 8))
-;;      (set chars.Hero.x (+ x dx))
-;;
-;;      (can-move? x (+ y dy 8))
-;;      (set chars.Hero.y (+ y dy)))))
+      (can-move? (+ x dx) (+ y 15))
+      (set chars.Hero.x (+ x dx))
+
+      (can-move? x (+ y dy 15))
+      (set chars.Hero.y (+ y dy)))))
+
+(fn interact
+  []
+  (if (and (btn 4) (= 120 (mget (// chars.Hero.x 8) (// (+ chars.Hero.y 16) 8))))
+    (mset chars.Hero.x (+ chars.Hero.y 15) 122)))
 
 (fn main
   []
   (cls)
-  (map 12 7 6 12 95 60 0 1)
   (draw)
   (move)
+  (interact)
   (set t (+ 1 t)))
 
 (fn intro
