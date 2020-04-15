@@ -3,22 +3,29 @@
 (var (cam-x cam-y) (values center-x center-y))
 
 (var t 0)
+(var restart nil)
 
+(local all {})
 (local chars {})
 
-(local initial-positions {:Hero [105 75] :Willie [125 65] :Colter [264 16] :Tyler [84 300] :Neil [39 304]})
+(local initial-positions {:Hero [105 65] :Willie [125 65] :Colter [264 16] :Tyler [84 300] :Neil [39 304]})
 (set chars.Hero {:name "Hero" :spr 256 :portrait 257 :side-1 259 :side-2 260 :down-1 261 :down-2 262 :up-1 263 :up-2 264})
 (set chars.Willie {:name "Willie" :spr 288 :portrait 289})
 (set chars.Colter {:name "Colter" :spr 320 :portrait 321})
 (set chars.Tyler {:name "Tyler" :spr 352 :portrait 353})
 (set chars.Neil {:name "Neil" :spr 384 :portrait 385})
 
+(set chars.Narrator {:name "Narrator" :x 0 :y 0 :portrait 271})
+
 (fn init
   []
   (each [name pos (pairs initial-positions)]
     (let [[x y] pos]
      (tset (. chars name) :x x)
-     (tset (. chars name) :y y))))
+     (tset (. chars name) :y y)))
+  (set-dialog (fn [] (describe "Unknown Bar" "" "Downtown Toronto...")))
+  (each [name (pairs chars)]
+   (tset convos name (. all name))))
 
 (fn walking-animation
   [anim-spr-1 anim-spr-2 x y flip?]
@@ -82,25 +89,39 @@
   (if (and (btn 4) (= 120 (mget (// chars.Hero.x 8) (// (+ chars.Hero.y 16) 8))))
     (mset chars.Hero.x (+ chars.Hero.y 15) 122)))
 
+(fn check-dialog
+  []
+  (when (btnp 6)
+    (set-dialog (fn []
+                  (set who nil)
+                  (let [choice (ask "" ["Restart" "Cancel"])]
+                    (when (= choice "Restart")
+                      (restart))))))
+  (let [talking-to (dialog chars.Hero.x chars.Hero.y (btnp 4))]
+   (if (and talking-to (btnp 0)) (choose -1)
+    (and talking-to (btnp 1)) (choose 1)
+    (not talking-to) (move))))
+
 (fn main
   []
   (cls)
   (draw)
-  (move)
-  (interact)
+  (draw-dialog :portrait)
+  (check-dialog)
   (set t (+ 1 t)))
 
 (fn intro
   []
-  (main)
+  (cls)
+  (draw)
   (print "q  u  a  r  a  n  v  a  n" 60 10)
   (print "Press z to start" 75 25)
-  (for [i 0 5]
+  (for [i 0 6]
    (when (btnp i)
      (global TIC main))))
 
 (init)
 (trace "This is the console; type run to start.")
 (trace "Press ESC for the art, code, and sound.")
-
 (global TIC intro) ; Function called once every frame
+(set restart (fn [] (init) (global TIC main)))
