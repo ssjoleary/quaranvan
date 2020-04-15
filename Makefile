@@ -25,3 +25,7 @@ deploy-staging:
 deploy-prod:
 	make unzip
 	netlify deploy --dir=game.lua --prod
+
+.PHONY: tic-watch
+tic-watch:
+	tic80 -code-watch build/game.lua
