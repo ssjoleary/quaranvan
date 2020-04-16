@@ -6,9 +6,8 @@
 (var restart nil)
 
 (local all {})
-(local chars {})
 
-(local initial-positions {:Hero [105 65] :Willie [125 65] :Colter [264 16] :Tyler [84 300] :Neil [39 304]})
+(local initial-positions {:Hero [109 65] :Willie [127 65] :Colter [264 16] :Tyler [84 300] :Neil [39 304]})
 (set chars.Hero {:name "Hero" :spr 256 :portrait 257 :side-1 259 :side-2 260 :down-1 261 :down-2 262 :up-1 263 :up-2 264})
 (set chars.Willie {:name "Willie" :spr 288 :portrait 289})
 (set chars.Colter {:name "Colter" :spr 320 :portrait 321})
@@ -17,13 +16,22 @@
 
 (set chars.Narrator {:name "Narrator" :x 0 :y 0 :portrait 271})
 
+(fn all.Willie
+  []
+  (say "Hello there")
+  (reply "Hey")
+  (say "Go and see if you can open"
+       ""
+       "that door over there")
+  (reply "Ok"))
+
 (fn init
   []
   (each [name pos (pairs initial-positions)]
     (let [[x y] pos]
      (tset (. chars name) :x x)
      (tset (. chars name) :y y)))
-  (set-dialog (fn [] (describe "Unknown Bar" "" "Downtown Toronto...")))
+  (set-dialog (fn [] (describe "Teds Bar" "" "Downtown Toronto...")))
   (each [name (pairs chars)]
    (tset convos name (. all name))))
 
@@ -61,7 +69,7 @@
 
 (fn can-move-point?
   [px py]
-  (= 1 (mget (// px 8) (// py 8))))
+  (>= 80 (mget (// px 8) (// py 8))))
 
 (fn can-move?
   [x y]
@@ -86,8 +94,11 @@
 
 (fn interact
   []
-  (if (and (btn 4) (= 120 (mget (// chars.Hero.x 8) (// (+ chars.Hero.y 16) 8))))
-    (mset chars.Hero.x (+ chars.Hero.y 15) 122)))
+  (when (and (btn 4) (= 120 (mget (// chars.Hero.x 8) (// (+ chars.Hero.y 16) 8))))
+    (mset (// chars.Hero.x 8) (// (+ chars.Hero.y 16) 8) 7)
+    (mset (// (+ chars.Hero.x 8) 8) (// (+ chars.Hero.y 16) 8) 8)
+    (mset (// chars.Hero.x 8) (// (+ chars.Hero.y 24) 8) 23)
+    (mset (// (+ chars.Hero.x 8) 8) (// (+ chars.Hero.y 24) 8) 24)))
 
 (fn check-dialog
   []
@@ -108,6 +119,7 @@
   (draw)
   (draw-dialog :portrait)
   (check-dialog)
+  (interact)
   (set t (+ 1 t)))
 
 (fn intro

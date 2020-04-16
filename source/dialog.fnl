@@ -63,7 +63,8 @@
 
 (local talk-range 12)
 
-(fn find-convo [x y]
+(fn find-convo
+  [x y]
   (var target nil)
   (var target-dist talk-range)
   (var char nil)
