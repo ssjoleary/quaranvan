@@ -1,4 +1,9 @@
-;; Loads custom palette using a string. See <https://github.com/nesbox/TIC-80/wiki/palette> for more information.
+(var t 0)
+(var SCENE "BAR")
+(local all {})
+(local (w h) (values 240 136))
+(var OPENING true)
+
 (fn load-palette
   [str]
   (for [i 0 15 1]
@@ -10,4 +15,3 @@
 
     (poke (+ 0x03FC0 (* i 3) 2)
           (tonumber (string.sub str (+ (* i 6) 5) (+ (* i 6) 6)) 16))))
-
