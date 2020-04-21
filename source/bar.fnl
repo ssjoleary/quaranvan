@@ -7,22 +7,17 @@
        "that door over there")
   (reply "Ok"))
 
-(fn render-bar-scene
+(fn render-bar-specifics
   []
-  (when OPENING
+  (when OPENING?
     (set-dialog (fn [] (describe "Teds Bar" "" "Downtown Toronto...")))
-    (set OPENING false))
-  (map 12 6
-       5 10
-       89 48
-       1
-       1)
+    (set OPENING? false))
   (if
    (= 1 (// (% t 60) 30))
-   (spr 5 107 56 0 1 0 0 1 1)
+   (spr 5 114 56 0 1 0 0 1 1)
 
    (= 0 (// (% t 60) 30))
-   (spr 6 107 56 0 1 0 0 1 1))
+   (spr 6 114 56 0 1 0 0 1 1))
   (let [c chars.Willie]
     (spr c.spr c.x c.y 0 1 1 0 1 2))
   (let [c chars.Hero]

@@ -1,4 +1,4 @@
-(local initial-positions {:Hero [96 57] :Willie [115 57] :Colter [264 16] :Tyler [84 300] :Neil [39 304]})
+(local initial-positions {:Hero [102 57] :Willie [120 57] :Colter [264 16] :Tyler [84 300] :Neil [39 304]})
 (set chars.Hero {:name "Hero" :spr 256 :portrait 257 :side-1 259 :side-2 260 :down-1 261 :down-2 262 :up-1 263 :up-2 264})
 (set chars.Willie {:name "Willie" :spr 288 :portrait 289})
 (set chars.Colter {:name "Colter" :spr 320 :portrait 321})
@@ -14,11 +14,23 @@
   (each [name (pairs chars)]
    (tset convos name (. all name))))
 
+(fn set-scene
+  [scene]
+  (let [coords (. SCENES SCENE)
+        cx     (. coords :x)
+        cy     (. coords :y)]
+    (for [i 0 29]
+      (for [j 0 16]
+        (mset i j (mget (+ cx i) (+ cy j)))))
+    (set SCENE-SET? true)))
+
 (fn draw
   []
+  (when (not SCENE-SET?)
+    (set-scene SCENE))
   (if
     (= SCENE "BAR")
-    (render-bar-scene)
+    (render-bar-specifics)
 
     (and (= SCENE "PARKING-LOT") (not fading))
     (render-parking-lot-scene)))
@@ -35,6 +47,7 @@
 (fn game-loop
   []
   (cls)
+  (map)
   (game-options)
   (draw)
   (draw-dialog :portrait)
@@ -46,6 +59,7 @@
 (fn splash-screen
   []
   (cls)
+  (map)
   (draw)
   (print "q  u  a  r  a  n  v  a  n" 60 10)
   (print "Press z to start" 75 25)

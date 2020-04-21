@@ -23,13 +23,13 @@
 (fn can-move-point?
   [px py]
   (and
-    (< 0 (mget (// px 8) (// py 8)))
+    (not (= 0 (mget (// px 8) (// py 8))))
     (>= 96 (mget (// px 8) (// py 8)))))
 
 (fn can-move?
   [x y]
   (and (can-move-point? x y)
-       (can-move-point? (+ x 5) y)))
+       (can-move-point? (+ x 11) y)))
 
 (fn move
   []
@@ -37,6 +37,8 @@
         dy  (if (btn 0) -1 (btn 1) 1 0)
         x   chars.Hero.x
         y   chars.Hero.y]
+    (print (mget (// x 8) (// y 8)))
+    (print (mget (// (+ x dx) 8) (// (+ y dy 15) 8)) 0 20)
     (if
       (can-move? (+ x dx) (+ y dy 15))
       (set (chars.Hero.x chars.Hero.y) (values (+ x dx) (+ y dy)))
