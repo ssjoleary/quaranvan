@@ -33,12 +33,10 @@
 
 (fn move
   []
-  (let [dx  (if (btn 2) -1 (btn 3) 1 0)
-        dy  (if (btn 0) -1 (btn 1) 1 0)
-        x   chars.Hero.x
-        y   chars.Hero.y]
-    (print (mget (// x 8) (// y 8)))
-    (print (mget (// (+ x dx) 8) (// (+ y dy 15) 8)) 0 20)
+  (let [dx (if (btn 2) -1 (btn 3) 1 0)
+        dy (if (btn 0) -1 (btn 1) 1 0)
+        x  chars.Hero.x
+        y  chars.Hero.y]
     (if
       (can-move? (+ x dx) (+ y dy 15))
       (set (chars.Hero.x chars.Hero.y) (values (+ x dx) (+ y dy)))
@@ -51,13 +49,13 @@
 
 (fn interaction?
   []
-  (when (and (btn 4) (= 119 (mget (// chars.Hero.x 8) (// (+ chars.Hero.y 15) 8))))
+  (when (and (btn 4) (= 119 (mget (// chars.Hero.x 8) (// (+ chars.Hero.y 16) 8))))
     (mset (// chars.Hero.x 8) (// (+ chars.Hero.y 16) 8) 7)
     (mset (// (+ chars.Hero.x 8) 8) (// (+ chars.Hero.y 16) 8) 8)
     (mset (// chars.Hero.x 8) (// (+ chars.Hero.y 24) 8) 23)
     (mset (// (+ chars.Hero.x 8) 8) (// (+ chars.Hero.y 24) 8) 24))
-  (when (= 81 (mget (// chars.Hero.x 8) (// (+ chars.Hero.y 16) 8)))
-    (set fading true)
+  (when (= 80 (mget (// chars.Hero.x 8) (// (+ chars.Hero.y 16) 8)))
+    (set SCENE-SET? false)
     (set SCENE "PARKING-LOT")))
 
 (fn dialog?

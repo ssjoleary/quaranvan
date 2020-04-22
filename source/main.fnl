@@ -21,8 +21,7 @@
         cy     (. coords :y)]
     (for [i 0 29]
       (for [j 0 16]
-        (mset i j (mget (+ cx i) (+ cy j)))))
-    (set SCENE-SET? true)))
+        (mset i j (mget (+ cx i) (+ cy j)))))))
 
 (fn draw
   []
@@ -32,7 +31,7 @@
     (= SCENE "BAR")
     (render-bar-specifics)
 
-    (and (= SCENE "PARKING-LOT") (not fading))
+    (= SCENE "PARKING-LOT")
     (render-parking-lot-scene)))
 
 (fn game-options
